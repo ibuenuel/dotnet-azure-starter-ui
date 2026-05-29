@@ -39,7 +39,10 @@ export function TodoCard({ todo }: TodoCardProps) {
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <CardTitle
-            className={cn("text-base leading-snug", todo.isCompleted && "line-through text-muted-foreground")}
+            className={cn(
+              "text-base leading-snug",
+              todo.isCompleted && "line-through text-muted-foreground",
+            )}
           >
             {todo.title}
           </CardTitle>
@@ -57,7 +60,9 @@ export function TodoCard({ todo }: TodoCardProps) {
           <p
             className={cn(
               "text-xs",
-              todo.isOverdue && !todo.isCompleted ? "text-destructive font-medium" : "text-muted-foreground",
+              todo.isOverdue && !todo.isCompleted
+                ? "text-destructive font-medium"
+                : "text-muted-foreground",
             )}
           >
             Due {new Date(todo.dueDate).toLocaleDateString()}
@@ -73,13 +78,14 @@ export function TodoCard({ todo }: TodoCardProps) {
             disabled={isPending}
             className="size-4 rounded border-input accent-primary"
           />
-          <label htmlFor={`complete-${todo.id}`} className="text-xs text-muted-foreground cursor-pointer">
+          <label
+            htmlFor={`complete-${todo.id}`}
+            className="text-xs text-muted-foreground cursor-pointer"
+          >
             {todo.isCompleted ? "Completed" : "Mark as complete"}
           </label>
         </div>
-        {updateError && (
-          <p className="text-xs text-destructive">{updateError}</p>
-        )}
+        {updateError && <p className="text-xs text-destructive">{updateError}</p>}
       </CardContent>
 
       <CardFooter className="flex justify-between gap-2 pt-0">

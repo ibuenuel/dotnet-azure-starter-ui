@@ -27,10 +27,7 @@ export function TodoDetail({ id }: TodoDetailProps) {
 
   if (isError || !todo) {
     return (
-      <ErrorState
-        message={error?.message ?? "Todo not found."}
-        onRetry={() => void refetch()}
-      />
+      <ErrorState message={error?.message ?? "Todo not found."} onRetry={() => void refetch()} />
     );
   }
 
@@ -81,40 +78,45 @@ export function TodoDetail({ id }: TodoDetailProps) {
           <Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
             Edit
           </Button>
-          <TodoDeleteButton
-            id={todo.id}
-            onSuccess={() => router.push("/todos")}
-          />
+          <TodoDeleteButton id={todo.id} onSuccess={() => router.push("/todos")} />
         </div>
       </div>
 
       <div className="space-y-4 text-sm">
         {todo.description && (
           <div className="space-y-1">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Description</p>
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+              Description
+            </p>
             <p className="text-foreground">{todo.description}</p>
           </div>
         )}
 
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <div className="space-y-1">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Due Date</p>
-            <p className={cn(
-              "text-foreground",
-              todo.isOverdue && !todo.isCompleted && "text-destructive font-medium",
-            )}>
-              {todo.dueDate
-                ? new Date(todo.dueDate).toLocaleDateString()
-                : "—"}
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+              Due Date
+            </p>
+            <p
+              className={cn(
+                "text-foreground",
+                todo.isOverdue && !todo.isCompleted && "text-destructive font-medium",
+              )}
+            >
+              {todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : "—"}
               {todo.isOverdue && !todo.isCompleted && " (Overdue)"}
             </p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Created</p>
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+              Created
+            </p>
             <p className="text-foreground">{new Date(todo.createdAt).toLocaleDateString()}</p>
           </div>
           <div className="space-y-1">
-            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">Updated</p>
+            <p className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
+              Updated
+            </p>
             <p className="text-foreground">{new Date(todo.updatedAt).toLocaleDateString()}</p>
           </div>
         </div>

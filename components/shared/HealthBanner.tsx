@@ -17,12 +17,7 @@ export function HealthBanner() {
         <WifiOff className="size-4 shrink-0" aria-hidden="true" />
         <span>Cannot reach the API. Some features may be unavailable.</span>
       </div>
-      <Button
-        variant="ghost"
-        size="xs"
-        onClick={() => setDismissed(true)}
-        aria-label="Dismiss"
-      >
+      <Button variant="ghost" size="xs" onClick={() => setDismissed(true)} aria-label="Dismiss">
         Dismiss
       </Button>
     </div>

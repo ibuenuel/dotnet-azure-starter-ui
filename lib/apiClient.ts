@@ -4,7 +4,9 @@ import type { TodoItem, CreateTodoRequest, UpdateTodoRequest } from "@/types/tod
 async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
   const base = process.env.NEXT_PUBLIC_API_URL;
   if (!base) {
-    throw new Error("NEXT_PUBLIC_API_URL is not set. Copy .env.example to .env.local and set the value.");
+    throw new Error(
+      "NEXT_PUBLIC_API_URL is not set. Copy .env.example to .env.local and set the value.",
+    );
   }
   const res = await fetch(`${base}${endpoint}`, {
     headers: { "Content-Type": "application/json" },
@@ -45,6 +47,5 @@ export const apiClient = {
   updateTodo: (id: string, body: UpdateTodoRequest) =>
     apiFetch<TodoItem>(`/api/todos/${id}`, { method: "PUT", body: JSON.stringify(body) }),
 
-  deleteTodo: (id: string) =>
-    apiFetch<object>(`/api/todos/${id}`, { method: "DELETE" }),
+  deleteTodo: (id: string) => apiFetch<object>(`/api/todos/${id}`, { method: "DELETE" }),
 };

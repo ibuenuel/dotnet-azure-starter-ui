@@ -29,9 +29,7 @@ export function TodoDeleteButton({ id, onSuccess }: TodoDeleteButtonProps) {
       >
         {isPending ? "Deleting…" : "Delete"}
       </Button>
-      {deleteError && (
-        <p className="text-xs text-destructive">{deleteError}</p>
-      )}
+      {deleteError && <p className="text-xs text-destructive">{deleteError}</p>}
     </div>
   );
 }

@@ -14,7 +14,7 @@ import { cn } from "@/lib/utils";
 const schema = z.object({
   title: z.string().min(1, "Title is required").max(200, "Title must be 200 characters or less"),
   description: z.string().optional(),
-  priority: z.coerce.number().pipe(z.union([z.literal(1), z.literal(2), z.literal(3)])),
+  priority: z.union([z.literal(1), z.literal(2), z.literal(3)]),
   dueDate: z.string().nullable().optional(),
   isCompleted: z.boolean().optional(),
 });
@@ -85,9 +85,7 @@ export function TodoForm({ todo, onSuccess, onCancel }: TodoFormProps) {
       <div className="space-y-1.5">
         <Label htmlFor="title">Title</Label>
         <Input id="title" {...register("title")} aria-invalid={!!errors.title} />
-        {errors.title && (
-          <p className="text-xs text-destructive">{errors.title.message}</p>
-        )}
+        {errors.title && <p className="text-xs text-destructive">{errors.title.message}</p>}
       </div>
 
       <div className="space-y-1.5">
@@ -107,7 +105,7 @@ export function TodoForm({ todo, onSuccess, onCancel }: TodoFormProps) {
         <Label htmlFor="priority">Priority</Label>
         <select
           id="priority"
-          {...register("priority")}
+          {...register("priority", { valueAsNumber: true })}
           className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50"
         >
           <option value={TodoPriority.High}>High</option>
@@ -133,9 +131,7 @@ export function TodoForm({ todo, onSuccess, onCancel }: TodoFormProps) {
         </div>
       )}
 
-      {mutationError && (
-        <p className="text-sm text-destructive">{mutationError.message}</p>
-      )}
+      {mutationError && <p className="text-sm text-destructive">{mutationError.message}</p>}
 
       <div className="flex justify-end gap-2 pt-2">
         <Button type="button" variant="outline" onClick={onCancel} disabled={isPending}>

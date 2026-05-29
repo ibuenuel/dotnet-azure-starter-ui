@@ -26,33 +26,33 @@ The project is deployed independently to **Azure Static Web Apps (Free Tier)** i
 
 ## Tech Stack
 
-| Concern      | Technology                        |
-| ------------ | --------------------------------- |
-| Framework    | Next.js 16 (App Router, Turbopack) |
-| Language     | TypeScript 5 (strict mode)        |
-| Styling      | Tailwind CSS v4                   |
-| Components   | shadcn/ui + @base-ui/react        |
-| Server state | TanStack Query v5                 |
-| HTTP client  | Native `fetch` + typed wrapper    |
-| Forms        | React Hook Form + Zod             |
-| Linting      | ESLint v9 Flat Config + Prettier  |
+| Concern      | Technology                                  |
+| ------------ | ------------------------------------------- |
+| Framework    | Next.js 16 (App Router, Turbopack)          |
+| Language     | TypeScript 5 (strict mode)                  |
+| Styling      | Tailwind CSS v4                             |
+| Components   | shadcn/ui + @base-ui/react                  |
+| Server state | TanStack Query v5                           |
+| HTTP client  | Native `fetch` + typed wrapper              |
+| Forms        | React Hook Form + Zod                       |
+| Linting      | ESLint v9 Flat Config + Prettier            |
 | Testing      | Vitest + React Testing Library + Playwright |
-| Deployment   | Azure Static Web Apps (Free)      |
-| IaC          | Azure Bicep                       |
+| Deployment   | Azure Static Web Apps (Free)                |
+| IaC          | Azure Bicep                                 |
 
 ---
 
 ## Project Status
 
-| Phase | Description | Status |
-| ----- | ----------- | ------ |
-| 1 | Scaffold — Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier | Complete |
-| 2 | API Client — typed `apiClient`, `ApiResponse<T>` types, `.env` setup | Complete |
-| 3 | Todo Feature — list, detail, create, edit, delete (hooks + components) | Complete |
-| 4 | Polish — loading skeletons, error states, empty states, health banner | Complete |
-| 5 | Tests — Vitest component tests, msw API mocking, Playwright E2E | Planned |
-| 6 | IaC + CI/CD — Bicep, GitHub Actions CI, Azure SWA deploy workflow | Planned |
-| 7 | Documentation — screenshots, architecture diagram | Planned |
+| Phase | Description                                                                       | Status   |
+| ----- | --------------------------------------------------------------------------------- | -------- |
+| 1     | Scaffold — Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier | Complete |
+| 2     | API Client — typed `apiClient`, `ApiResponse<T>` types, `.env` setup              | Complete |
+| 3     | Todo Feature — list, detail, create, edit, delete (hooks + components)            | Complete |
+| 4     | Polish — loading skeletons, error states, empty states, health banner             | Complete |
+| 5     | Tests — Vitest component tests, msw API mocking, Playwright E2E                   | Complete |
+| 6     | IaC + CI/CD — Bicep, GitHub Actions CI, Azure SWA deploy workflow                 | Planned  |
+| 7     | Documentation — screenshots, architecture diagram                                 | Planned  |
 
 ---
 
@@ -89,17 +89,19 @@ npm run dev
 
 ## Available Scripts
 
-| Command | Description |
-| ------- | ----------- |
-| `npm run dev` | Start dev server (Turbopack) |
-| `npm run build` | Production build |
-| `npm run start` | Serve production build |
-| `npm run lint` | ESLint + Prettier check |
+| Command          | Description                          |
+| ---------------- | ------------------------------------ |
+| `npm run dev`    | Start dev server (Turbopack)         |
+| `npm run build`  | Production build                     |
+| `npm run start`  | Serve production build               |
+| `npm run lint`   | ESLint + Prettier check              |
 | `npm run format` | Prettier write (auto-fix formatting) |
+| `npm test`       | Vitest unit/component tests          |
+| `npm run e2e`    | Playwright E2E tests (requires backend) |
 
 ---
 
-## Project Structure (Phase 1 – 4)
+## Project Structure (Phase 1 – 5)
 
 ```
 dotnet-azure-starter-ui/
@@ -146,20 +148,41 @@ dotnet-azure-starter-ui/
 │   ├── api.ts              # ApiResponse<T>, PagedResult<T>, PaginationRequest
 │   └── todo.ts             # TodoItem, TodoPriority, PRIORITY_LABEL/CLASS, CreateTodoRequest, UpdateTodoRequest
 │
+├── __mocks__/
+│   └── next/
+│       ├── link.tsx        # Manual mock — renders plain <a> in tests
+│       └── navigation.ts   # Manual mock — vi.fn() stubs for useRouter, usePathname
+│
+├── __tests__/
+│   ├── setup.ts            # MSW server lifecycle + jest-dom + env vars
+│   ├── mocks/
+│   │   ├── factories.ts    # Type-safe test data builders (makeTodo, makeApiResponse, …)
+│   │   ├── handlers.ts     # Default MSW happy-path handlers for all 6 endpoints
+│   │   └── server.ts       # setupServer(…handlers)
+│   ├── utils/
+│   │   └── renderWithProviders.tsx  # QueryClient wrapper + createWrapper() for renderHook
+│   ├── components/         # 22 component tests (ErrorState, HealthBanner, TodoCard, TodoForm, TodoList, TodoDeleteButton)
+│   └── hooks/              # 12 hook tests (all 6 CRUD + useHealth hooks)
+│
+├── e2e/
+│   └── todos.spec.ts       # Playwright — view list, create, edit, delete flows
+│
 ├── .env.example            # Environment variable documentation
 ├── components.json         # shadcn/ui configuration
 ├── eslint.config.mjs       # ESLint v9 Flat Config
 ├── next.config.ts          # cacheComponents: true
+├── playwright.config.ts    # Playwright — Chromium, webServer: npm run dev
 ├── postcss.config.mjs      # @tailwindcss/postcss
-└── tsconfig.json           # strict: true
+├── tsconfig.json           # strict: true
+└── vitest.config.ts        # jsdom, globals, setupFiles, vite-tsconfig-paths
 ```
 
 ---
 
 ## Environment Variables
 
-| Variable | Description | Example |
-| -------- | ----------- | ------- |
+| Variable              | Description                              | Example                 |
+| --------------------- | ---------------------------------------- | ----------------------- |
 | `NEXT_PUBLIC_API_URL` | Backend API base URL — no trailing slash | `http://localhost:8080` |
 
 Copy `.env.example` to `.env.local` before running `npm run dev`. In production, this is set as an Application Setting in Azure Static Web Apps via Bicep — never committed to source control.
