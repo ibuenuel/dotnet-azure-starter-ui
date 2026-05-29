@@ -51,7 +51,7 @@ The project is deployed independently to **Azure Static Web Apps (Free Tier)** i
 | 3     | Todo Feature — list, detail, create, edit, delete (hooks + components)            | Complete |
 | 4     | Polish — loading skeletons, error states, empty states, health banner             | Complete |
 | 5     | Tests — Vitest component tests, msw API mocking, Playwright E2E                   | Complete |
-| 6     | IaC + CI/CD — Bicep, GitHub Actions CI, Azure SWA deploy workflow                 | Planned  |
+| 6     | IaC + CI/CD — Bicep, GitHub Actions CI, Azure SWA deploy workflow                 | Complete |
 | 7     | Documentation — screenshots, architecture diagram                                 | Planned  |
 
 ---
@@ -89,19 +89,20 @@ npm run dev
 
 ## Available Scripts
 
-| Command          | Description                          |
-| ---------------- | ------------------------------------ |
-| `npm run dev`    | Start dev server (Turbopack)         |
-| `npm run build`  | Production build                     |
-| `npm run start`  | Serve production build               |
-| `npm run lint`   | ESLint + Prettier check              |
-| `npm run format` | Prettier write (auto-fix formatting) |
-| `npm test`       | Vitest unit/component tests          |
-| `npm run e2e`    | Playwright E2E tests (requires backend) |
+| Command              | Description                             |
+| -------------------- | --------------------------------------- |
+| `npm run dev`        | Start dev server (Turbopack)            |
+| `npm run build`      | Production build                        |
+| `npm run start`      | Serve production build                  |
+| `npm run type-check` | TypeScript type-check (no emit)         |
+| `npm run lint`       | ESLint + Prettier check                 |
+| `npm run format`     | Prettier write (auto-fix formatting)    |
+| `npm test`           | Vitest unit/component tests             |
+| `npm run e2e`        | Playwright E2E tests (requires backend) |
 
 ---
 
-## Project Structure (Phase 1 – 5)
+## Project Structure (Phase 1 – 6)
 
 ```
 dotnet-azure-starter-ui/
@@ -166,6 +167,13 @@ dotnet-azure-starter-ui/
 │
 ├── e2e/
 │   └── todos.spec.ts       # Playwright — view list, create, edit, delete flows
+│
+├── infra/
+│   └── static-web-app.bicep  # Azure Static Web Apps Free Tier — prefix/environment/backendUrl params
+│
+├── .github/
+│   └── workflows/
+│       └── ci.yml          # CI — type-check → lint → vitest → next build (PR + push to main)
 │
 ├── .env.example            # Environment variable documentation
 ├── components.json         # shadcn/ui configuration
