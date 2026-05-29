@@ -47,7 +47,7 @@ The project is deployed independently to **Azure Static Web Apps (Free Tier)** i
 | ----- | ----------- | ------ |
 | 1 | Scaffold — Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier | Complete |
 | 2 | API Client — typed `apiClient`, `ApiResponse<T>` types, `.env` setup | Complete |
-| 3 | Todo Feature — list, detail, create, edit, delete (hooks + components) | Planned |
+| 3 | Todo Feature — list, detail, create, edit, delete (hooks + components) | Complete |
 | 4 | Polish — loading skeletons, error states, empty states, health banner | Planned |
 | 5 | Tests — Vitest component tests, msw API mocking, Playwright E2E | Planned |
 | 6 | IaC + CI/CD — Bicep, GitHub Actions CI, Azure SWA deploy workflow | Planned |
@@ -98,7 +98,7 @@ npm run dev
 
 ---
 
-## Project Structure (Phase 1 + 2)
+## Project Structure (Phase 1 + 2 + 3)
 
 ```
 dotnet-azure-starter-ui/
@@ -106,10 +106,23 @@ dotnet-azure-starter-ui/
 │   ├── layout.tsx          # Root layout — Geist fonts, metadata, Providers wrapper
 │   ├── page.tsx            # Landing page — tech stack showcase
 │   ├── providers.tsx       # QueryClientProvider (Client Component)
-│   └── globals.css         # Tailwind v4 base + CSS theme variables
+│   ├── globals.css         # Tailwind v4 base + CSS theme variables
+│   └── todos/
+│       ├── page.tsx        # Paginated todo list (Server Component)
+│       └── [id]/
+│           └── page.tsx    # Todo detail — Suspense + async shell (cacheComponents compat)
 │
 ├── components/
-│   └── ui/                 # shadcn/ui base components (badge, button, card, input, label, separator)
+│   ├── ui/                 # shadcn/ui base components (badge, button, card, input, label, separator)
+│   ├── todos/
+│   │   ├── TodoList.tsx        # Paginated grid + Base UI Dialog for create
+│   │   ├── TodoCard.tsx        # Todo card — priority badge, overdue date, completion toggle
+│   │   ├── TodoForm.tsx        # Create/edit form — React Hook Form + Zod v4
+│   │   ├── TodoDeleteButton.tsx # Delete button with loading state
+│   │   └── TodoDetail.tsx      # Detail view with inline edit toggle
+│   └── shared/
+│       ├── LoadingSpinner.tsx  # Animated spinner
+│       └── Pagination.tsx      # Previous/Next pagination controls
 │
 ├── hooks/
 │   ├── useTodos.ts         # GET /api/todos (paginated)

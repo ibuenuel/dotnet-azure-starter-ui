@@ -3,11 +3,18 @@ import type { TodoItem, CreateTodoRequest, UpdateTodoRequest } from "@/types/tod
 
 async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<ApiResponse<T>> {
   const base = process.env.NEXT_PUBLIC_API_URL;
+  if (!base) {
+    throw new Error("NEXT_PUBLIC_API_URL is not set. Copy .env.example to .env.local and set the value.");
+  }
   const res = await fetch(`${base}${endpoint}`, {
     headers: { "Content-Type": "application/json" },
     ...options,
   });
-  return res.json() as Promise<ApiResponse<T>>;
+  try {
+    return (await res.json()) as ApiResponse<T>;
+  } catch {
+    throw new Error(`Server returned a non-JSON response (HTTP ${res.status})`);
+  }
 }
 
 export const apiClient = {
