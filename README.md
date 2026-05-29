@@ -46,7 +46,7 @@ The project is deployed independently to **Azure Static Web Apps (Free Tier)** i
 | Phase | Description | Status |
 | ----- | ----------- | ------ |
 | 1 | Scaffold — Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier | Complete |
-| 2 | API Client — typed `apiClient`, `ApiResponse<T>` types, `.env` setup | Planned |
+| 2 | API Client — typed `apiClient`, `ApiResponse<T>` types, `.env` setup | Complete |
 | 3 | Todo Feature — list, detail, create, edit, delete (hooks + components) | Planned |
 | 4 | Polish — loading skeletons, error states, empty states, health banner | Planned |
 | 5 | Tests — Vitest component tests, msw API mocking, Playwright E2E | Planned |
@@ -98,20 +98,34 @@ npm run dev
 
 ---
 
-## Project Structure (Phase 1)
+## Project Structure (Phase 1 + 2)
 
 ```
 dotnet-azure-starter-ui/
 ├── app/
-│   ├── layout.tsx          # Root layout — Geist fonts, metadata
+│   ├── layout.tsx          # Root layout — Geist fonts, metadata, Providers wrapper
 │   ├── page.tsx            # Landing page — tech stack showcase
+│   ├── providers.tsx       # QueryClientProvider (Client Component)
 │   └── globals.css         # Tailwind v4 base + CSS theme variables
 │
 ├── components/
 │   └── ui/                 # shadcn/ui base components (badge, button, card, input, label, separator)
 │
+├── hooks/
+│   ├── useTodos.ts         # GET /api/todos (paginated)
+│   ├── useTodo.ts          # GET /api/todos/:id
+│   ├── useCreateTodo.ts    # POST /api/todos
+│   ├── useUpdateTodo.ts    # PUT /api/todos/:id
+│   └── useDeleteTodo.ts    # DELETE /api/todos/:id
+│
 ├── lib/
+│   ├── apiClient.ts        # Typed fetch wrapper — all HTTP calls go through here
+│   ├── queryClient.ts      # makeQueryClient() factory
 │   └── utils.ts            # cn() helper (clsx + tailwind-merge)
+│
+├── types/
+│   ├── api.ts              # ApiResponse<T>, PagedResult<T>, PaginationRequest
+│   └── todo.ts             # TodoItem, TodoPriority, CreateTodoRequest, UpdateTodoRequest
 │
 ├── .env.example            # Environment variable documentation
 ├── components.json         # shadcn/ui configuration
