@@ -4,6 +4,7 @@ Production-grade Next.js frontend for the [dotnet-azure-starter](https://github.
 
 [![CI](https://github.com/ibuenuel/dotnet-azure-starter-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/ibuenuel/dotnet-azure-starter-ui/actions/workflows/ci.yml)
 [![CD](https://github.com/ibuenuel/dotnet-azure-starter-ui/actions/workflows/azure-static-web-apps.yml/badge.svg)](https://github.com/ibuenuel/dotnet-azure-starter-ui/actions/workflows/azure-static-web-apps.yml)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Azure_SWA-0078d4?logo=microsoftazure)](https://brave-grass-0b871c503.7.azurestaticapps.net/)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwindcss)
@@ -46,15 +47,15 @@ The project deploys independently to **Azure Static Web Apps (Free Tier)** in th
 
 ## Project Status
 
-| Phase | Description                                                                        | Status   |
-| ----- | ---------------------------------------------------------------------------------- | -------- |
-| 1     | Scaffold — Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier  | Complete |
-| 2     | API Client — typed `apiClient`, `ApiResponse<T>` types, `.env` setup               | Complete |
-| 3     | Todo Feature — list, detail, create, edit, delete (hooks + components)             | Complete |
-| 4     | Polish — loading skeletons, error states, empty states, health banner              | Complete |
-| 5     | Tests — Vitest component tests, msw API mocking, Playwright E2E                    | Complete |
-| 6     | IaC + CI/CD — Bicep, GitHub Actions CI + CD, Azure SWA deploy workflow             | Complete |
-| 7     | Documentation — screenshots, architecture diagram                                  | Planned  |
+| Phase | Description                                                                       | Status   |
+| ----- | --------------------------------------------------------------------------------- | -------- |
+| 1     | Scaffold — Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier | Complete |
+| 2     | API Client — typed `apiClient`, `ApiResponse<T>` types, `.env` setup              | Complete |
+| 3     | Todo Feature — list, detail, create, edit, delete (hooks + components)            | Complete |
+| 4     | Polish — loading skeletons, error states, empty states, health banner             | Complete |
+| 5     | Tests — Vitest component tests, msw API mocking, Playwright E2E                   | Complete |
+| 6     | IaC + CI/CD — Bicep, GitHub Actions CI + CD, Azure SWA deploy workflow            | Complete |
+| 7     | Documentation — screenshots, architecture diagram                                 | Planned  |
 
 ---
 
@@ -206,12 +207,12 @@ The project deploys to **Azure Static Web Apps (Free Tier)** in the same subscri
 
 ### How CI/CD works
 
-| Workflow | Trigger | What it does |
-| -------- | ------- | ------------ |
-| `ci.yml` | Push to `main`, PR to `main` | Type-check → lint → Vitest → `next build` |
-| `azure-static-web-apps.yml` | Push to `main` | Build + deploy to production |
-| `azure-static-web-apps.yml` | PR opened / updated | Build + deploy to preview URL |
-| `azure-static-web-apps.yml` | PR closed | Delete preview environment |
+| Workflow                    | Trigger                      | What it does                              |
+| --------------------------- | ---------------------------- | ----------------------------------------- |
+| `ci.yml`                    | Push to `main`, PR to `main` | Type-check → lint → Vitest → `next build` |
+| `azure-static-web-apps.yml` | Push to `main`               | Build + deploy to production              |
+| `azure-static-web-apps.yml` | PR opened / updated          | Build + deploy to preview URL             |
+| `azure-static-web-apps.yml` | PR closed                    | Delete preview environment                |
 
 ### Prerequisites
 
@@ -245,10 +246,10 @@ az staticwebapp secrets list \
 
 Repository → **Settings → Secrets and variables → Actions → New repository secret**
 
-| Secret | Value |
-| ------ | ----- |
-| `AZURE_STATIC_WEB_APPS_API_TOKEN` | Deploy token from command above |
-| `NEXT_PUBLIC_API_URL` | `https://app-dotnetazstarter-dev.azurewebsites.net` |
+| Secret                            | Value                                               |
+| --------------------------------- | --------------------------------------------------- |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN` | Deploy token from command above                     |
+| `NEXT_PUBLIC_API_URL`             | `https://app-dotnetazstarter-dev.azurewebsites.net` |
 
 Once both secrets are set, push to `main` — the CD workflow deploys automatically.
 
