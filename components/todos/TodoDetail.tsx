@@ -5,10 +5,11 @@ import { useRouter } from "next/navigation";
 import { useTodo } from "@/hooks/useTodo";
 import { TodoForm } from "@/components/todos/TodoForm";
 import { TodoDeleteButton } from "@/components/todos/TodoDeleteButton";
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { TodoDetailSkeleton } from "@/components/shared/TodoDetailSkeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { TodoPriority, PRIORITY_LABEL, PRIORITY_CLASS } from "@/types/todo";
+import { PRIORITY_LABEL, PRIORITY_CLASS } from "@/types/todo";
 import { cn } from "@/lib/utils";
 
 interface TodoDetailProps {
@@ -17,22 +18,19 @@ interface TodoDetailProps {
 
 export function TodoDetail({ id }: TodoDetailProps) {
   const router = useRouter();
-  const { data: todo, isLoading, isError, error } = useTodo(id);
+  const { data: todo, isLoading, isError, error, refetch } = useTodo(id);
   const [isEditing, setIsEditing] = useState(false);
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center py-16">
-        <LoadingSpinner className="size-8" />
-      </div>
-    );
+    return <TodoDetailSkeleton />;
   }
 
   if (isError || !todo) {
     return (
-      <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-        {error?.message ?? "Todo not found."}
-      </div>
+      <ErrorState
+        message={error?.message ?? "Todo not found."}
+        onRetry={() => void refetch()}
+      />
     );
   }
 

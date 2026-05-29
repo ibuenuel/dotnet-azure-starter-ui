@@ -17,7 +17,8 @@ This frontend consumes the `dotnet-azure-starter` .NET 10 REST API and demonstra
 - Typed API client wrapping native `fetch` against `ApiResponse<T>` envelopes
 - Optimistic updates via TanStack Query v5
 - Schema-validated forms with React Hook Form + Zod
-- Loading skeletons, error boundaries, and empty states
+- Skeleton loaders, contextual error states with retry, and empty state UX
+- API health banner — polls `GET /health` every 30 s and surfaces connectivity issues
 
 The project is deployed independently to **Azure Static Web Apps (Free Tier)** in the same subscription and resource group as the backend.
 
@@ -48,7 +49,7 @@ The project is deployed independently to **Azure Static Web Apps (Free Tier)** i
 | 1 | Scaffold — Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier | Complete |
 | 2 | API Client — typed `apiClient`, `ApiResponse<T>` types, `.env` setup | Complete |
 | 3 | Todo Feature — list, detail, create, edit, delete (hooks + components) | Complete |
-| 4 | Polish — loading skeletons, error states, empty states, health banner | Planned |
+| 4 | Polish — loading skeletons, error states, empty states, health banner | Complete |
 | 5 | Tests — Vitest component tests, msw API mocking, Playwright E2E | Planned |
 | 6 | IaC + CI/CD — Bicep, GitHub Actions CI, Azure SWA deploy workflow | Planned |
 | 7 | Documentation — screenshots, architecture diagram | Planned |
@@ -98,12 +99,12 @@ npm run dev
 
 ---
 
-## Project Structure (Phase 1 + 2 + 3)
+## Project Structure (Phase 1 – 4)
 
 ```
 dotnet-azure-starter-ui/
 ├── app/
-│   ├── layout.tsx          # Root layout — Geist fonts, metadata, Providers wrapper
+│   ├── layout.tsx          # Root layout — Geist fonts, metadata, HealthBanner, Providers
 │   ├── page.tsx            # Landing page — tech stack showcase
 │   ├── providers.tsx       # QueryClientProvider (Client Component)
 │   ├── globals.css         # Tailwind v4 base + CSS theme variables
@@ -118,18 +119,23 @@ dotnet-azure-starter-ui/
 │   │   ├── TodoList.tsx        # Paginated grid + Base UI Dialog for create
 │   │   ├── TodoCard.tsx        # Todo card — priority badge, overdue date, completion toggle
 │   │   ├── TodoForm.tsx        # Create/edit form — React Hook Form + Zod v4
-│   │   ├── TodoDeleteButton.tsx # Delete button with loading state
+│   │   ├── TodoDeleteButton.tsx # Delete button — loading + inline error state
 │   │   └── TodoDetail.tsx      # Detail view with inline edit toggle
 │   └── shared/
 │       ├── LoadingSpinner.tsx  # Animated spinner
-│       └── Pagination.tsx      # Previous/Next pagination controls
+│       ├── Pagination.tsx      # Previous/Next pagination controls
+│       ├── TodoCardSkeleton.tsx # Skeleton placeholder matching TodoCard layout
+│       ├── TodoDetailSkeleton.tsx # Skeleton placeholder matching TodoDetail layout
+│       ├── ErrorState.tsx      # Error message with optional retry button
+│       └── HealthBanner.tsx    # API health banner — shown only when backend unreachable
 │
 ├── hooks/
 │   ├── useTodos.ts         # GET /api/todos (paginated)
 │   ├── useTodo.ts          # GET /api/todos/:id
 │   ├── useCreateTodo.ts    # POST /api/todos
 │   ├── useUpdateTodo.ts    # PUT /api/todos/:id
-│   └── useDeleteTodo.ts    # DELETE /api/todos/:id
+│   ├── useDeleteTodo.ts    # DELETE /api/todos/:id
+│   └── useHealth.ts        # GET /health — polls every 30 s
 │
 ├── lib/
 │   ├── apiClient.ts        # Typed fetch wrapper — all HTTP calls go through here
@@ -138,7 +144,7 @@ dotnet-azure-starter-ui/
 │
 ├── types/
 │   ├── api.ts              # ApiResponse<T>, PagedResult<T>, PaginationRequest
-│   └── todo.ts             # TodoItem, TodoPriority, CreateTodoRequest, UpdateTodoRequest
+│   └── todo.ts             # TodoItem, TodoPriority, PRIORITY_LABEL/CLASS, CreateTodoRequest, UpdateTodoRequest
 │
 ├── .env.example            # Environment variable documentation
 ├── components.json         # shadcn/ui configuration

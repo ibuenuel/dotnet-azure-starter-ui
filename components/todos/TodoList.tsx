@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
+import { ClipboardList } from "lucide-react";
 import { useTodos } from "@/hooks/useTodos";
 import { TodoCard } from "@/components/todos/TodoCard";
 import { TodoForm } from "@/components/todos/TodoForm";
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { TodoCardSkeleton } from "@/components/shared/TodoCardSkeleton";
+import { ErrorState } from "@/components/shared/ErrorState";
 import { Pagination } from "@/components/shared/Pagination";
 import { Button } from "@/components/ui/button";
 
@@ -14,22 +16,20 @@ const PAGE_SIZE = 12;
 export function TodoList() {
   const [page, setPage] = useState(1);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const { data, isLoading, isError, error } = useTodos(page, PAGE_SIZE);
+  const { data, isLoading, isError, error, refetch } = useTodos(page, PAGE_SIZE);
 
   if (isLoading) {
     return (
-      <div className="flex justify-center py-16">
-        <LoadingSpinner className="size-8" />
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+          <TodoCardSkeleton key={i} />
+        ))}
       </div>
     );
   }
 
   if (isError) {
-    return (
-      <div className="rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-sm text-destructive">
-        {error?.message ?? "Failed to load todos."}
-      </div>
-    );
+    return <ErrorState message={error?.message} onRetry={() => void refetch()} />;
   }
 
   const todos = data?.items ?? [];
@@ -59,6 +59,7 @@ export function TodoList() {
 
       {todos.length === 0 ? (
         <div className="flex flex-col items-center gap-3 py-16 text-center">
+          <ClipboardList className="size-10 text-muted-foreground/40" aria-hidden="true" />
           <p className="text-muted-foreground">No todos yet.</p>
           <Button size="sm" onClick={() => setIsCreateOpen(true)}>
             Create your first todo

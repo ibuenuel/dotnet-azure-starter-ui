@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { TodoDeleteButton } from "@/components/todos/TodoDeleteButton";
 import { useUpdateTodo } from "@/hooks/useUpdateTodo";
-import { type TodoItem, TodoPriority, PRIORITY_LABEL, PRIORITY_CLASS } from "@/types/todo";
+import { type TodoItem, PRIORITY_LABEL, PRIORITY_CLASS } from "@/types/todo";
 import { cn } from "@/lib/utils";
 
 interface TodoCardProps {
@@ -14,18 +15,23 @@ interface TodoCardProps {
 
 export function TodoCard({ todo }: TodoCardProps) {
   const { mutate, isPending } = useUpdateTodo();
+  const [updateError, setUpdateError] = useState<string | null>(null);
 
   function handleToggleComplete(checked: boolean) {
-    mutate({
-      id: todo.id,
-      body: {
-        title: todo.title,
-        description: todo.description ?? null,
-        isCompleted: checked,
-        dueDate: todo.dueDate ?? null,
-        priority: todo.priority,
+    setUpdateError(null);
+    mutate(
+      {
+        id: todo.id,
+        body: {
+          title: todo.title,
+          description: todo.description ?? null,
+          isCompleted: checked,
+          dueDate: todo.dueDate ?? null,
+          priority: todo.priority,
+        },
       },
-    });
+      { onError: (err) => setUpdateError(err.message) },
+    );
   }
 
   return (
@@ -71,6 +77,9 @@ export function TodoCard({ todo }: TodoCardProps) {
             {todo.isCompleted ? "Completed" : "Mark as complete"}
           </label>
         </div>
+        {updateError && (
+          <p className="text-xs text-destructive">{updateError}</p>
+        )}
       </CardContent>
 
       <CardFooter className="flex justify-between gap-2 pt-0">

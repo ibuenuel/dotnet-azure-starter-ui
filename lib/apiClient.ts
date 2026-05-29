@@ -10,10 +10,26 @@ async function apiFetch<T>(endpoint: string, options?: RequestInit): Promise<Api
     headers: { "Content-Type": "application/json" },
     ...options,
   });
+  const text = await res.text();
+  if (!text) {
+    return { success: res.ok, traceId: "" } as ApiResponse<T>;
+  }
   try {
-    return (await res.json()) as ApiResponse<T>;
+    return JSON.parse(text) as ApiResponse<T>;
   } catch {
     throw new Error(`Server returned a non-JSON response (HTTP ${res.status})`);
+  }
+}
+
+// /health returns plain 200 — not ApiResponse<T>, so apiFetch is intentionally not used here
+export async function checkHealth({ signal }: { signal?: AbortSignal } = {}): Promise<boolean> {
+  try {
+    const base = process.env.NEXT_PUBLIC_API_URL;
+    if (!base) return false;
+    const res = await fetch(`${base}/health`, { signal });
+    return res.ok;
+  } catch {
+    return false;
   }
 }
 
