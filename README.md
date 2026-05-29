@@ -199,9 +199,65 @@ Copy `.env.example` to `.env.local` before running `npm run dev`. In production,
 
 ## Deployment
 
-The project deploys to **Azure Static Web Apps (Free Tier)**. Azure auto-generates a GitHub Actions workflow on resource creation that handles build and deploy on push to `main` and creates preview environments for PRs.
+The project deploys to **Azure Static Web Apps (Free Tier)** in the same subscription and resource group as the backend. Infrastructure is defined in [`infra/static-web-app.bicep`](infra/static-web-app.bicep).
 
-Infrastructure is defined in `infra/static-web-app.bicep` (Phase 6).
+### Prerequisites
+
+- [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) installed and logged in (`az login`)
+- An existing Azure resource group (e.g. `rg-dotnetazstarter-dev`)
+- The backend API already deployed and its URL available
+
+### 1 — Provision the Static Web App
+
+```bash
+az deployment group create --resource-group rg-dotnetazstarter-dev --template-file infra/static-web-app.bicep --parameters prefix=dotnetazstarter environment=dev backendUrl=https://app-dotnetazstarter-dev.azurewebsites.net
+```
+
+This creates the `swa-dotnetazstarter-dev` resource and injects `NEXT_PUBLIC_API_URL` as an Azure Application Setting — the production URL is never committed to source control.
+
+### 2 — Connect GitHub and set the deploy token
+
+Because the Bicep template does not include GitHub repository parameters, the GitHub connection must be established manually after provisioning.
+
+**2a — Get the deploy token from Azure:**
+
+```bash
+az staticwebapp secrets list --name swa-dotnetazstarter-dev --resource-group rg-dotnetazstarter-dev --query "properties.apiKey" -o tsv
+```
+
+**2b — Add it as a GitHub Secret:**
+
+Repository → Settings → Secrets and variables → Actions → New repository secret
+
+| Name                              | Value                  |
+| --------------------------------- | ---------------------- |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN` | _(token from step 2a)_ |
+
+**2c — Connect the GitHub repo in Azure Portal:**
+
+Open the SWA resource → **GitHub Actions** → **Configure** → select your repository and `main` branch. Azure pushes a `.github/workflows/azure-static-web-apps-<hash>.yml` file to the repo automatically.
+
+From that point on, CI/CD is fully automatic:
+
+| Event               | Result                                               |
+| ------------------- | ---------------------------------------------------- |
+| Push to `main`      | Build + deploy to production                         |
+| Pull request opened | Build + deploy to preview URL (posted as PR comment) |
+| Pull request closed | Preview environment deleted                          |
+
+### 3 — Deployed URL
+
+```bash
+az staticwebapp show --name swa-dotnetazstarter-dev --resource-group rg-dotnetazstarter-dev --query "defaultHostname" -o tsv
+```
+
+### GitHub Secrets summary
+
+| Secret                            | Set by                 |
+| --------------------------------- | ---------------------- |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN` | Manually (see step 2b) |
+
+`NEXT_PUBLIC_API_URL` is **not** a GitHub Secret — it is managed as an Azure Application Setting via Bicep.
 
 ---
 
