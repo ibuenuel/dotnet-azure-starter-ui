@@ -49,7 +49,15 @@ export default function HomePage() {
             rel="noopener noreferrer"
             className={buttonVariants({ variant: "outline", size: "lg" })}
           >
-            GitHub
+            Frontend
+          </a>
+          <a
+            href="https://github.com/ibuenuel/dotnet-azure-starter"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={buttonVariants({ variant: "outline", size: "lg" })}
+          >
+            Backend
           </a>
         </div>
 

@@ -2,6 +2,8 @@
 
 Production-grade Next.js frontend for the [dotnet-azure-starter](https://github.com/ibuenuel/dotnet-azure-starter) REST API. Serves as the visual layer of the boilerplate and as a standalone portfolio piece showing full-stack engineering across independently deployable repositories.
 
+[![CI](https://github.com/ibuenuel/dotnet-azure-starter-ui/actions/workflows/ci.yml/badge.svg)](https://github.com/ibuenuel/dotnet-azure-starter-ui/actions/workflows/ci.yml)
+[![CD](https://github.com/ibuenuel/dotnet-azure-starter-ui/actions/workflows/azure-static-web-apps.yml/badge.svg)](https://github.com/ibuenuel/dotnet-azure-starter-ui/actions/workflows/azure-static-web-apps.yml)
 ![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?logo=typescript)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-v4-38bdf8?logo=tailwindcss)
@@ -20,7 +22,7 @@ This frontend consumes the `dotnet-azure-starter` .NET 10 REST API and demonstra
 - Skeleton loaders, contextual error states with retry, and empty state UX
 - API health banner — polls `GET /health` every 30 s and surfaces connectivity issues
 
-The project is deployed independently to **Azure Static Web Apps (Free Tier)** in the same subscription and resource group as the backend.
+The project deploys independently to **Azure Static Web Apps (Free Tier)** in the same subscription and resource group as the backend.
 
 ---
 
@@ -44,15 +46,15 @@ The project is deployed independently to **Azure Static Web Apps (Free Tier)** i
 
 ## Project Status
 
-| Phase | Description                                                                       | Status   |
-| ----- | --------------------------------------------------------------------------------- | -------- |
-| 1     | Scaffold — Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier | Complete |
-| 2     | API Client — typed `apiClient`, `ApiResponse<T>` types, `.env` setup              | Complete |
-| 3     | Todo Feature — list, detail, create, edit, delete (hooks + components)            | Complete |
-| 4     | Polish — loading skeletons, error states, empty states, health banner             | Complete |
-| 5     | Tests — Vitest component tests, msw API mocking, Playwright E2E                   | Complete |
-| 6     | IaC + CI/CD — Bicep, GitHub Actions CI, Azure SWA deploy workflow                 | Complete |
-| 7     | Documentation — screenshots, architecture diagram                                 | Planned  |
+| Phase | Description                                                                        | Status   |
+| ----- | ---------------------------------------------------------------------------------- | -------- |
+| 1     | Scaffold — Next.js 16, TypeScript strict, Tailwind v4, shadcn/ui, ESLint/Prettier  | Complete |
+| 2     | API Client — typed `apiClient`, `ApiResponse<T>` types, `.env` setup               | Complete |
+| 3     | Todo Feature — list, detail, create, edit, delete (hooks + components)             | Complete |
+| 4     | Polish — loading skeletons, error states, empty states, health banner              | Complete |
+| 5     | Tests — Vitest component tests, msw API mocking, Playwright E2E                    | Complete |
+| 6     | IaC + CI/CD — Bicep, GitHub Actions CI + CD, Azure SWA deploy workflow             | Complete |
+| 7     | Documentation — screenshots, architecture diagram                                  | Planned  |
 
 ---
 
@@ -102,7 +104,7 @@ npm run dev
 
 ---
 
-## Project Structure (Phase 1 – 6)
+## Project Structure
 
 ```
 dotnet-azure-starter-ui/
@@ -125,12 +127,12 @@ dotnet-azure-starter-ui/
 │   │   ├── TodoDeleteButton.tsx # Delete button — loading + inline error state
 │   │   └── TodoDetail.tsx      # Detail view with inline edit toggle
 │   └── shared/
-│       ├── LoadingSpinner.tsx  # Animated spinner
-│       ├── Pagination.tsx      # Previous/Next pagination controls
-│       ├── TodoCardSkeleton.tsx # Skeleton placeholder matching TodoCard layout
+│       ├── LoadingSpinner.tsx     # Animated spinner
+│       ├── Pagination.tsx         # Previous/Next pagination controls
+│       ├── TodoCardSkeleton.tsx   # Skeleton placeholder matching TodoCard layout
 │       ├── TodoDetailSkeleton.tsx # Skeleton placeholder matching TodoDetail layout
-│       ├── ErrorState.tsx      # Error message with optional retry button
-│       └── HealthBanner.tsx    # API health banner — shown only when backend unreachable
+│       ├── ErrorState.tsx         # Error message with optional retry button
+│       └── HealthBanner.tsx       # API health banner — shown only when backend unreachable
 │
 ├── hooks/
 │   ├── useTodos.ts         # GET /api/todos (paginated)
@@ -162,8 +164,8 @@ dotnet-azure-starter-ui/
 │   │   └── server.ts       # setupServer(…handlers)
 │   ├── utils/
 │   │   └── renderWithProviders.tsx  # QueryClient wrapper + createWrapper() for renderHook
-│   ├── components/         # 22 component tests (ErrorState, HealthBanner, TodoCard, TodoForm, TodoList, TodoDeleteButton)
-│   └── hooks/              # 12 hook tests (all 6 CRUD + useHealth hooks)
+│   ├── components/         # Component tests (ErrorState, HealthBanner, TodoCard, TodoForm, TodoList, TodoDeleteButton)
+│   └── hooks/              # Hook tests (all 6 CRUD + useHealth hooks)
 │
 ├── e2e/
 │   └── todos.spec.ts       # Playwright — view list, create, edit, delete flows
@@ -173,7 +175,8 @@ dotnet-azure-starter-ui/
 │
 ├── .github/
 │   └── workflows/
-│       └── ci.yml          # CI — type-check → lint → vitest → next build (PR + push to main)
+│       ├── ci.yml                    # CI — type-check → lint → vitest → next build
+│       └── azure-static-web-apps.yml # CD — build + deploy to Azure SWA on push to main; preview on PR
 │
 ├── .env.example            # Environment variable documentation
 ├── components.json         # shadcn/ui configuration
@@ -201,6 +204,15 @@ Copy `.env.example` to `.env.local` before running `npm run dev`. In production,
 
 The project deploys to **Azure Static Web Apps (Free Tier)** in the same subscription and resource group as the backend. Infrastructure is defined in [`infra/static-web-app.bicep`](infra/static-web-app.bicep).
 
+### How CI/CD works
+
+| Workflow | Trigger | What it does |
+| -------- | ------- | ------------ |
+| `ci.yml` | Push to `main`, PR to `main` | Type-check → lint → Vitest → `next build` |
+| `azure-static-web-apps.yml` | Push to `main` | Build + deploy to production |
+| `azure-static-web-apps.yml` | PR opened / updated | Build + deploy to preview URL |
+| `azure-static-web-apps.yml` | PR closed | Delete preview environment |
+
 ### Prerequisites
 
 - [Azure CLI](https://learn.microsoft.com/en-us/cli/azure/install-azure-cli) installed and logged in (`az login`)
@@ -210,54 +222,44 @@ The project deploys to **Azure Static Web Apps (Free Tier)** in the same subscri
 ### 1 — Provision the Static Web App
 
 ```bash
-az deployment group create --resource-group rg-dotnetazstarter-dev --template-file infra/static-web-app.bicep --parameters prefix=dotnetazstarter environment=dev backendUrl=https://app-dotnetazstarter-dev.azurewebsites.net
+az deployment group create \
+  --resource-group rg-dotnetazstarter-dev \
+  --template-file infra/static-web-app.bicep \
+  --parameters prefix=dotnetazstarter environment=dev \
+               backendUrl=https://app-dotnetazstarter-dev.azurewebsites.net
 ```
 
-This creates the `swa-dotnetazstarter-dev` resource and injects `NEXT_PUBLIC_API_URL` as an Azure Application Setting — the production URL is never committed to source control.
+This creates `swa-dotnetazstarter-dev` and injects `NEXT_PUBLIC_API_URL` as an Azure Application Setting — the production URL is never committed to source control.
 
-### 2 — Connect GitHub and set the deploy token
+### 2 — Add GitHub Secrets
 
-Because the Bicep template does not include GitHub repository parameters, the GitHub connection must be established manually after provisioning.
-
-**2a — Get the deploy token from Azure:**
+After provisioning, get the deploy token and add two secrets to the repository:
 
 ```bash
-az staticwebapp secrets list --name swa-dotnetazstarter-dev --resource-group rg-dotnetazstarter-dev --query "properties.apiKey" -o tsv
+# Get the deploy token
+az staticwebapp secrets list \
+  --name swa-dotnetazstarter-dev \
+  --resource-group rg-dotnetazstarter-dev \
+  --query "properties.apiKey" -o tsv
 ```
 
-**2b — Add it as a GitHub Secret:**
+Repository → **Settings → Secrets and variables → Actions → New repository secret**
 
-Repository → Settings → Secrets and variables → Actions → New repository secret
+| Secret | Value |
+| ------ | ----- |
+| `AZURE_STATIC_WEB_APPS_API_TOKEN` | Deploy token from command above |
+| `NEXT_PUBLIC_API_URL` | `https://app-dotnetazstarter-dev.azurewebsites.net` |
 
-| Name                              | Value                  |
-| --------------------------------- | ---------------------- |
-| `AZURE_STATIC_WEB_APPS_API_TOKEN` | _(token from step 2a)_ |
-
-**2c — Connect the GitHub repo in Azure Portal:**
-
-Open the SWA resource → **GitHub Actions** → **Configure** → select your repository and `main` branch. Azure pushes a `.github/workflows/azure-static-web-apps-<hash>.yml` file to the repo automatically.
-
-From that point on, CI/CD is fully automatic:
-
-| Event               | Result                                               |
-| ------------------- | ---------------------------------------------------- |
-| Push to `main`      | Build + deploy to production                         |
-| Pull request opened | Build + deploy to preview URL (posted as PR comment) |
-| Pull request closed | Preview environment deleted                          |
+Once both secrets are set, push to `main` — the CD workflow deploys automatically.
 
 ### 3 — Deployed URL
 
 ```bash
-az staticwebapp show --name swa-dotnetazstarter-dev --resource-group rg-dotnetazstarter-dev --query "defaultHostname" -o tsv
+az staticwebapp show \
+  --name swa-dotnetazstarter-dev \
+  --resource-group rg-dotnetazstarter-dev \
+  --query "defaultHostname" -o tsv
 ```
-
-### GitHub Secrets summary
-
-| Secret                            | Set by                 |
-| --------------------------------- | ---------------------- |
-| `AZURE_STATIC_WEB_APPS_API_TOKEN` | Manually (see step 2b) |
-
-`NEXT_PUBLIC_API_URL` is **not** a GitHub Secret — it is managed as an Azure Application Setting via Bicep.
 
 ---
 
