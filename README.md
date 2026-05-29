@@ -157,7 +157,7 @@ Infrastructure is defined in `infra/static-web-app.bicep` (Phase 6).
 
 ## Related
 
-- **Backend:** [dotnet-azure-starter](https://github.com/ibuenuel/dotnet-azure-starter) — .NET 9 REST API on Azure App Service
+- **Backend:** [dotnet-azure-starter](https://github.com/ibuenuel/dotnet-azure-starter) — .NET 10 REST API on Azure App Service
 
 ---
 
