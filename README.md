@@ -27,6 +27,43 @@ The project deploys independently to **Azure Static Web Apps (Free Tier)** in th
 
 ---
 
+## Architecture
+
+```mermaid
+graph LR
+    Browser["Browser"]
+    SWA["Azure Static Web Apps\n(Next.js · Free Tier)"]
+    API["Azure App Service\n(.NET 10 REST API)"]
+    SQL["Azure SQL\n(Basic 5 DTU)"]
+    KV["Azure Key Vault"]
+
+    Browser -->|serves bundle| SWA
+    Browser -->|NEXT_PUBLIC_API_URL · direct fetch| API
+    API -->|EF Core| SQL
+    API -->|secrets| KV
+```
+
+> The browser calls the .NET API directly via `NEXT_PUBLIC_API_URL` — there is no SWA proxy in the data path.
+
+---
+
+## Screenshots
+
+<table>
+  <tr>
+    <th>Home</th>
+    <th>Todo List</th>
+    <th>Todo Detail</th>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshot-home.png" width="280" alt="Home page" /></td>
+    <td><img src="docs/screenshot-todos.png" width="280" alt="Todo list" /></td>
+    <td><img src="docs/screenshot-detail.png" width="280" alt="Todo detail" /></td>
+  </tr>
+</table>
+
+---
+
 ## Tech Stack
 
 | Concern      | Technology                                  |
@@ -55,7 +92,7 @@ The project deploys independently to **Azure Static Web Apps (Free Tier)** in th
 | 4     | Polish — loading skeletons, error states, empty states, health banner             | Complete |
 | 5     | Tests — Vitest component tests, msw API mocking, Playwright E2E                   | Complete |
 | 6     | IaC + CI/CD — Bicep, GitHub Actions CI + CD, Azure SWA deploy workflow            | Complete |
-| 7     | Documentation — screenshots, architecture diagram                                 | Planned  |
+| 7     | Documentation — README with screenshots, architecture and CI/CD diagrams          | Complete |
 
 ---
 
@@ -63,6 +100,8 @@ The project deploys independently to **Azure Static Web Apps (Free Tier)** in th
 
 - **Node.js 20.9+**
 - **Backend running locally** — see [dotnet-azure-starter](https://github.com/ibuenuel/dotnet-azure-starter) (`docker compose up`)
+
+For the [live demo](https://brave-grass-0b871c503.7.azurestaticapps.net/) no local setup is needed — the backend is already deployed.
 
 ---
 
@@ -191,6 +230,42 @@ dotnet-azure-starter-ui/
 
 ---
 
+## Component Architecture
+
+<details>
+<summary>Rendering tree and data flow</summary>
+
+```mermaid
+graph TD
+    Layout["app/layout.tsx\n(Providers · HealthBanner)"]
+    TodosPage["app/todos/page.tsx\n(Server Component)"]
+    DetailPage["app/todos/[id]/page.tsx\n(Suspense shell)"]
+
+    TodoList["TodoList\n(pagination state)"]
+    TodoCard["TodoCard"]
+    TodoForm["TodoForm\n(RHF + Zod)"]
+    TodoDetail["TodoDetail\n(inline edit)"]
+
+    Hooks["TanStack Query hooks\nuseTodos · useTodo · useCreateTodo\nuseUpdateTodo · useDeleteTodo"]
+    ApiClient["lib/apiClient.ts\n(typed fetch wrapper)"]
+    Backend["dotnet-azure-starter API"]
+
+    Layout --> TodosPage
+    Layout --> DetailPage
+    TodosPage --> TodoList
+    TodoList --> TodoCard
+    TodoList --> TodoForm
+    DetailPage --> TodoDetail
+    TodoDetail --> TodoForm
+    TodoList & TodoDetail --> Hooks
+    Hooks --> ApiClient
+    ApiClient -->|NEXT_PUBLIC_API_URL| Backend
+```
+
+</details>
+
+---
+
 ## Environment Variables
 
 | Variable              | Description                              | Example                 |
@@ -206,6 +281,22 @@ Copy `.env.example` to `.env.local` before running `npm run dev`. In production,
 The project deploys to **Azure Static Web Apps (Free Tier)** in the same subscription and resource group as the backend. Infrastructure is defined in [`infra/static-web-app.bicep`](infra/static-web-app.bicep).
 
 ### How CI/CD works
+
+```mermaid
+graph LR
+    PR["Pull Request"]
+    Push["Push to main"]
+
+    CI["ci.yml\ntype-check → lint\n→ vitest → next build"]
+    Preview["Preview URL\n(posted as PR comment)"]
+    Prod["Azure SWA\nProduction"]
+    Cleanup["Preview env deleted\non PR close"]
+
+    PR --> CI
+    PR --> Preview
+    Push --> Prod
+    PR -->|closed| Cleanup
+```
 
 | Workflow                    | Trigger                      | What it does                              |
 | --------------------------- | ---------------------------- | ----------------------------------------- |
@@ -267,6 +358,7 @@ az staticwebapp show \
 ## Related
 
 - **Backend:** [dotnet-azure-starter](https://github.com/ibuenuel/dotnet-azure-starter) — .NET 10 REST API on Azure App Service
+- **Live Demo:** [brave-grass-0b871c503.7.azurestaticapps.net](https://brave-grass-0b871c503.7.azurestaticapps.net/)
 
 ---
 
